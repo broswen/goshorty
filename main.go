@@ -15,13 +15,14 @@ import (
 type ShortRequest struct {
 	Url  string `json:"url" binding:"required"`
 	Slug string `json:"slug"`
+	Exp  int64  `json:"exp"`
 }
 
 var ctx = context.Background()
 var rdb *redis.Client
 
 const (
-	timeoutSeconds = 10
+	maxTimeout = time.Hour * 24 * 7
 )
 
 func pingHandler(c *gin.Context) {
@@ -45,7 +46,20 @@ func shortHandler(c *gin.Context) {
 		return
 	}
 
-	err = rdb.Set(ctx, slug, request.Url, time.Second*timeoutSeconds).Err()
+	expiration := maxTimeout
+	// if exp exists and under maxTimeout, else use maxTimeout
+	if request.Exp != 0 {
+		exp := time.Duration(request.Exp) * time.Second
+		if exp > maxTimeout {
+			c.String(http.StatusBadRequest, errors.New("expiration exceeds maximum").Error())
+			return
+		}
+		expiration = exp
+	}
+
+	log.Println("exp", expiration)
+
+	err = rdb.Set(ctx, slug, request.Url, expiration).Err()
 	if err != nil {
 		panic(err)
 	}
@@ -65,8 +79,7 @@ func getSlug(slug string) (string, error) {
 		return id.String(), nil
 	}
 
-	val, err := rdb.Get(ctx, slug).Result()
-	log.Println("existing slug", val)
+	_, err := rdb.Get(ctx, slug).Result()
 	if err != nil && err != redis.Nil {
 		return "", err
 	}
