@@ -8,3 +8,5 @@ Start API and Redis server. Exposes API on port 8080.
 ```
 docker-compose up
 ```
+
+![diagram](./images/diagram.png)
