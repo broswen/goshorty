@@ -10,3 +10,25 @@ docker-compose up
 ```
 
 ![diagram](./images/diagram.png)
+
+
+1. Shorten URL, custom slug and expiration are optional.
+```json
+{
+    "url": "https://test.com",
+    "slug": "custom-url",
+    "exp": 60
+}
+```
+```json
+{
+    "url": "https://test.com"
+}
+```
+
+2. Response
+```json
+{
+    "slug":"custom-url or random slug"
+}
+```
