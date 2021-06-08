@@ -1,6 +1,6 @@
 An HTTP API for creating and resolving shortened links.
 
-Golang and Gorilla for the HTTP API, Redis for data cache.
+Golang and Gin for the HTTP API, Redis for data cache.
 
 Docker and Docker Compose to run instances.
 
